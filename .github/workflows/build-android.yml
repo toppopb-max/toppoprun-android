@@ -47,10 +47,10 @@ jobs:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD || secrets.KEY_PASSWORD || secrets.KEYSTORE_BASE64 }}
         run: |
           if [ -z "$KEYSTORE_PASSWORD" ]; then echo "Le secret KEYSTORE_PASSWORD manque"; exit 1; fi
-          PW=$(printf "%s" "$KEYSTORE_PASSWORD" | tr -d '[:space:]')
+          PW=$(printf "%s" "$KEYSTORE_PASSWORD" | tr -d '[:space:]-' | tr 'a-z' 'A-Z')
           echo "::add-mask::$PW"
           echo "Longueur du mot de passe : ${#PW} caractères (attendu : 20)"
-          if printf "%s" "$PW" | grep -qE '^[A-Za-z0-9]{20}$'; then echo "Format du mot de passe : OK (20 lettres/chiffres)"; else echo "Format du mot de passe : PAS BON (il contient autre chose que des lettres et chiffres, par ex. des deux-points)"; fi
+          if printf "%s" "$PW" | grep -qE '^[A-Z0-9]{20}$'; then echo "Format du mot de passe : OK (20 lettres/chiffres)"; else echo "Format du mot de passe : PAS BON (il contient autre chose que des lettres et chiffres, par ex. des deux-points)"; fi
           openssl enc -d -aes-256-cbc -pbkdf2 -iter 200000 -in toppop-run.keystore.enc -out toppop-run.keystore -pass "pass:$PW" || { echo "Mot de passe incorrect"; exit 1; }
           keytool -list -keystore toppop-run.keystore -storepass "$PW" -alias toppoprun > /dev/null && echo "Clé et mot de passe OK"
           echo "PW_CLEAN=$PW" >> "$GITHUB_ENV"

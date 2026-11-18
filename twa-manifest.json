@@ -30,6 +30,6 @@
   "isChromeOSOnly": false,
   "isMetaQuest": false,
   "fullScopeUrl": "https://toppop-run.netlify.app/",
-  "minSdkVersion": 21,
+  "minSdkVersion": 24,
   "fingerprints": [{ "name": "upload-key", "value": "55:3F:98:C9:47:4C:D7:89:24:C4:35:B1:F9:66:76:1C:91:C2:85:26:8C:34:E0:27:BC:7A:42:EC:D5:E2:C7:29" }]
 }

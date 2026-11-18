@@ -1,0 +1,16 @@
+*.keystore
+*.jks
+signing-key-info.txt
+app/
+gradle/
+build/
+.gradle/
+gradlew
+gradlew.bat
+build.gradle
+settings.gradle
+gradle.properties
+manifest-checksum.txt
+*.aab
+*.apk
+store_icon.png

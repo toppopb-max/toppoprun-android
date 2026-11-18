@@ -44,7 +44,7 @@ jobs:
 
       - name: Récupérer la clé de signature
         env:
-          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD || secrets.KEY_PASSWORD }}
         run: |
           if [ -z "$KEYSTORE_PASSWORD" ]; then echo "Le secret KEYSTORE_PASSWORD manque"; exit 1; fi
           PW=$(printf "%s" "$KEYSTORE_PASSWORD" | tr -d '[:space:]')

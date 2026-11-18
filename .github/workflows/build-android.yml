@@ -45,9 +45,13 @@ jobs:
       - name: Récupérer la clé de signature
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
         run: |
           if [ -z "$KEYSTORE_BASE64" ]; then echo "Le secret KEYSTORE_BASE64 manque"; exit 1; fi
-          echo "$KEYSTORE_BASE64" | base64 -d > toppop-run.keystore
+          CLEAN=$(printf "%s" "$KEYSTORE_BASE64" | tr -cd 'A-Za-z0-9+/=')
+          echo "Longueur de la clé collée : ${#CLEAN} caractères (attendu : 3584)"
+          printf "%s" "$CLEAN" | base64 -d > toppop-run.keystore
+          keytool -list -keystore toppop-run.keystore -storepass "$KEYSTORE_PASSWORD" -alias toppoprun > /dev/null && echo "Clé et mot de passe OK"
 
       - name: Générer le projet Android
         run: bubblewrap update --skipVersionUpgrade --manifest=./twa-manifest.json

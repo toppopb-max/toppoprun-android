@@ -44,22 +44,23 @@ jobs:
 
       - name: Récupérer la clé de signature
         env:
-          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
         run: |
-          if [ -z "$KEYSTORE_BASE64" ]; then echo "Le secret KEYSTORE_BASE64 manque"; exit 1; fi
-          CLEAN=$(printf "%s" "$KEYSTORE_BASE64" | tr -cd 'A-Za-z0-9+/=')
-          echo "Longueur de la clé collée : ${#CLEAN} caractères (attendu : 3584)"
-          printf "%s" "$CLEAN" | base64 -d > toppop-run.keystore
-          keytool -list -keystore toppop-run.keystore -storepass "$KEYSTORE_PASSWORD" -alias toppoprun > /dev/null && echo "Clé et mot de passe OK"
+          if [ -z "$KEYSTORE_PASSWORD" ]; then echo "Le secret KEYSTORE_PASSWORD manque"; exit 1; fi
+          PW=$(printf "%s" "$KEYSTORE_PASSWORD" | tr -d '[:space:]')
+          echo "::add-mask::$PW"
+          echo "Longueur du mot de passe : ${#PW} caractères (attendu : 20)"
+          openssl enc -d -aes-256-cbc -pbkdf2 -iter 200000 -in toppop-run.keystore.enc -out toppop-run.keystore -pass "pass:$PW" || { echo "Mot de passe incorrect"; exit 1; }
+          keytool -list -keystore toppop-run.keystore -storepass "$PW" -alias toppoprun > /dev/null && echo "Clé et mot de passe OK"
+          echo "PW_CLEAN=$PW" >> "$GITHUB_ENV"
 
       - name: Générer le projet Android
         run: bubblewrap update --skipVersionUpgrade --manifest=./twa-manifest.json
 
       - name: Fabriquer et signer l'appli
         env:
-          BUBBLEWRAP_KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-          BUBBLEWRAP_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          BUBBLEWRAP_KEYSTORE_PASSWORD: ${{ env.PW_CLEAN }}
+          BUBBLEWRAP_KEY_PASSWORD: ${{ env.PW_CLEAN }}
         run: bubblewrap build --skipPwaValidation --manifest=./twa-manifest.json
 
       - name: Préparer assetlinks.json

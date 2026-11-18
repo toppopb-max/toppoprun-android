@@ -14,5 +14,5 @@ Ce dépôt fabrique automatiquement l'appli Android de **Toppop Run** (https://t
 Augmenter `appVersionCode` (+1) et `appVersion` dans `twa-manifest.json`, puis relancer.
 
 ## Secrets nécessaires (Settings → Secrets and variables → Actions)
-- `KEYSTORE_BASE64` : la clé de signature encodée en base64
-- `KEYSTORE_PASSWORD` et `KEY_PASSWORD` : les mots de passe (voir signing-key-info.txt, gardé hors du dépôt)
+- `KEYSTORE_PASSWORD` : le mot de passe de la clé (voir signing-key-info.txt, gardé hors du dépôt).
+La clé `toppop-run.keystore.enc` est chiffrée (AES-256) avec ce mot de passe : sans lui, elle est inutilisable.
